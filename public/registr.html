@@ -1,0 +1,86 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="static/css/bootstrap.css" rel="stylesheet">
+    <link href="static/css/likes.css" rel="stylesheet" type="text/css" />
+    <link href="static/css/class.css" rel="stylesheet" type="text/css" />
+    <link href="static/css/avatar.css" rel="stylesheet" type="text/css" />
+    <title>main</title>
+  </head>
+
+ <body class="custom_container">
+    <div class="header">
+        <h1><a href="header.html" style="color: white;">Домашняя книга рецептов</a></h1>
+    </div>
+
+    <div class="main">
+                <div class="h2_custom" style="margin-left: 30px;">Создание аккаунта</div>
+                    <div class="box_without_border" style="gap: 20px; justify-content: flex-start;">
+                        <label for="username">Имя пользователя <span class="required-star">*</span></label>
+                        <input type="text" id="username" name="username" placeholder="cook_anna" required>
+                        <error class="required-star">такое имя уже занято</error>
+                    </div>
+                    
+                    <div class="box_without_border" style="gap: 20px; justify-content: flex-start;">
+                        <label for="email">Электронная почта <span class="required-star">*</span></label>
+                        <input type="email" id="email" name="email" placeholder="anna@example.com" required>
+                        <error class="required-star">такая почта уже существует</error>
+                    </div>
+                    
+                    <div class="box_without_border" style="gap: 20px; justify-content: flex-start;">
+                        <label for="password">Пароль <span class="required-star">*</span></label>
+                        <input type="password" id="password" name="password" placeholder="Создайте пароль" required>
+                        <span class="field-hint">Минимум 6 символов</span>
+                    </div>
+                    
+                    <div class="box_without_border" style="gap: 20px; justify-content: flex-start;">
+                        <label for="confirm_password">Подтверждение пароля <span class="required-star">*</span></label>
+                        <input type="password" id="confirm_password" name="confirm_password" placeholder="Повторите пароль" required>
+                    </div>
+
+                    <div class="box_without_border" style="gap: 20px; justify-content: flex-start; flex-direction: column;">
+                        <label for="avatar">Аватар профиля</label>
+                        <div class="avatar-upload">
+                            <div class="avatar-preview" id="avatarPreview">
+                                <img src="static/img/images.png" alt="Предпросмотр аватара" class="preview-img">
+                            </div>
+                            <div class="avatar-controls">
+                                <label for="avatar" class="button-small">Выбрать файл</label>
+                                <input type="file" id="avatar" name="avatar" accept="image/jpeg,image/png,image/gif" style="display: none;">
+                                 <span class="field-hint">Рекомендуемый размер: 200x200px. JPEG, PNG, GIF до 2MB</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="button">Зарегистрироваться</button>
+                <div class="box_without_border" style="gap: 20px; justify-content: flex-start;">
+                    <p>Уже есть аккаунт? <a href="login.html">Войдите</a></p>
+                </div>   
+            </div>
+        </div>
+    </div>
+    
+    <div class="side">
+        <h2 class="h2_custom" style="margin-top: 40px;">
+            Популярные теги
+        </h2>
+        <div class="tags">
+            <a href='#' style="color: rgb(0, 255, 55);">Овощи</a>
+            <a href="#" style="color: rgb(247, 61, 5);">Фрукты</a>
+            <a href="#" style="color: rgb(0, 47, 255);">Ягоды</a>
+            <a href="header_tag.html" style="color: rgba(255, 123, 0, 0.63);">Выпечка</a>
+        </div>
+        <h2 class="h2_custom" style="margin-top: 20px;">
+            Лучшие пользователи
+        </h2>
+        <div class="users_tags">
+            <a href="#">linking park</a>
+            <a href="#">Mr chief</a>
+            <a href="#">just a user</a>
+        </div>
+    </div>
+    
+    <div class="footer"></div>
+</body>
+</html>
