@@ -11,3 +11,24 @@
 - new-question.html - страница создания нового вопроса
 - question.html - страница уже созданного вопроса
 - registr.html - страница для регистрации
+
+# Проект cooking_site
+
+верстка с первого задния была шаблонизирована и используется для создания сайта ответов на сервере django
+
+## Как запустить проект на django
+
+1. Клонируйте Репозиторий
+
+2. Создайте и активируйте виртуальное окружение (python -m venv venv 
+venv\Scripts\activate)
+
+3. Установите зависимости pip install -r requirements.txt
+
+4. Примените миграции (python manage.py migrate)
+
+5. Запустите сервер (python manage.py runserver)
+
+
+
+

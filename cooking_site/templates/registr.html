@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Регистрация - Домашняя книга рецептов{% endblock %}
+
+{% block extra_css %}
+<link href="{% static 'css/avatar.css' %}" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block content %}
+<div class="h2_custom" style="margin-left: 30px;">Создание аккаунта</div>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    
+    <div class="box_without_border" style="gap: 20px; justify-content: flex-start;">
+        <label for="username">Имя пользователя <span class="required-star">*</span></label>
+        <input type="text" id="username" name="username" 
+               placeholder="cook_anna" value="{{ form.username.value|default:'' }}" required>
+        {% if form.username.errors %}
+            <error class="required-star">{{ form.username.errors.0 }}</error>
+        {% endif %}
+    </div>
+    
+    <div class="box_without_border" style="gap: 20px; justify-content: flex-start;">
+        <label for="email">Электронная почта <span class="required-star">*</span></label>
+        <input type="email" id="email" name="email" 
+               placeholder="anna@example.com" value="{{ form.email.value|default:'' }}" required>
+        {% if form.email.errors %}
+            <error class="required-star">{{ form.email.errors.0 }}</error>
+        {% endif %}
+    </div>
+    
+    <div class="box_without_border" style="gap: 20px; justify-content: flex-start;">
+        <label for="password1">Пароль <span class="required-star">*</span></label>
+        <input type="password" id="password1" name="password1" 
+               placeholder="Создайте пароль" required>
+        <span class="field-hint">Минимум 6 символов</span>
+        {% if form.password1.errors %}
+            <error class="required-star">{{ form.password1.errors.0 }}</error>
+        {% endif %}
+    </div>
+    
+    <div class="box_without_border" style="gap: 20px; justify-content: flex-start;">
+        <label for="password2">Подтверждение пароля <span class="required-star">*</span></label>
+        <input type="password" id="password2" name="password2" 
+               placeholder="Повторите пароль" required>
+        {% if form.password2.errors %}
+            <error class="required-star">{{ form.password2.errors.0 }}</error>
+        {% endif %}
+    </div>
+
+    <div class="box_without_border" style="gap: 20px; justify-content: flex-start; flex-direction: column;">
+        <label for="avatar">Аватар профиля</label>
+        <div class="avatar-upload">
+            <div class="avatar-preview" id="avatarPreview">
+                <img src="{% static 'img/images.png' %}" alt="Предпросмотр аватара" class="preview-img">
+            </div>
+            <div class="avatar-controls">
+                <label for="avatar" class="button-small">Выбрать файл</label>
+                <input type="file" id="avatar" name="avatar" 
+                       accept="image/jpeg,image/png,image/gif" style="display: none;">
+                <span class="field-hint">Рекомендуемый размер: 200x200px. JPEG, PNG, GIF до 2MB</span>
+            </div>
+        </div>
+    </div>
+    
+    <button type="submit" class="button">Зарегистрироваться</button>
+    
+    <div class="box_without_border" style="gap: 20px; justify-content: flex-start;">
+        <p>Уже есть аккаунт? <a href="{% url 'app:login' %}">Войдите</a></p>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Предпросмотр аватара
+    document.getElementById('avatar').addEventListener('change', function(e) {
+        const reader = new FileReader();
+        reader.onload = function() {
+            const preview = document.querySelector('#avatarPreview .preview-img');
+            preview.src = reader.result;
+        }
+        reader.readAsDataURL(e.target.files[0]);
+    });
+</script>
+{% endblock %}

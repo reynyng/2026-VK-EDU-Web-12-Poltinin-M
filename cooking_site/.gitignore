@@ -1,0 +1,30 @@
+# Виртуальное окружение (НЕ добавляем в Git)
+venv/
+env/
+.venv/
+Scripts/
+Lib/
+Include/
+pyvenv.cfg
+__pycache__/
+*.pyc
+
+# База данных
+db.sqlite3
+*.sqlite3
+
+# Секреты
+.env
+.env.local
+
+# Загрузки пользователей
+uploads/*
+!/uploads/.gitkeep
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Логи
+*.log

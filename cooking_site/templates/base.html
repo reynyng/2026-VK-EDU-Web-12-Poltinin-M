@@ -1,0 +1,78 @@
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="{% static 'css/bootstrap.css' %}" rel="stylesheet">
+    <link href="{% static 'css/likes.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'css/class.css' %}" rel="stylesheet" type="text/css" />
+    {% block extra_css %}{% endblock %}
+    <title>{% block title %}Домашняя книга рецептов{% endblock %}</title>
+</head>
+
+<body class="custom_container">
+    <div class="header">
+        <h1><a href="{% url 'app:home' %}" style="color: white;">Домашняя книга рецептов</a></h1>
+        <div class="search">
+            <input type="text" id="seek" name="seek" placeholder="введите запрос" required class="line">
+            <a href="{% url 'app:ask' %}" class="button">
+                Задать вопрос
+            </a>
+            <div class="guest-avatar">
+                {% if user.avatar %}
+                    <img src="{{ user.avatar.url }}" alt="Аватар" class="avatar-img">
+                {% else %}
+                    <img src="{% static 'img/images.png' %}" alt="Гость" class="avatar-img">
+                {% endif %}
+            </div>
+            <div class="user-guest">
+                {% if user.is_authenticated %}
+                    {{ user.username }}
+                    <div class="regestration">
+                        <a href="{% url 'app:profile_edit' %}" class="login-btn">Профиль</a>
+                        <a href="{% url 'app:logout' %}" class="register-btn">Выйти</a>
+                    </div>
+                {% else %}
+                    guest
+                    <div class="regestration">
+                        <a href="{% url 'app:login' %}" class="login-btn">Вход</a>
+                        <a href="{% url 'app:signup' %}" class="register-btn">Регистрация</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="main">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <div class="side">
+        <h2 class="h2_custom" style="margin-top: 40px;">
+            Популярные теги
+        </h2>
+        <div class="tags">
+            {% for tag in popular_tags %}
+                <a href="{% url 'app:tag_questions' tag_name=tag.name %}" 
+                   style="color: {{ tag.color }};">
+                    {{ tag.name }}
+                </a>
+            {% endfor %}
+        </div>
+        <h2 class="h2_custom" style="margin-top: 20px;">
+            Лучшие пользователи
+        </h2>
+        <div class="users_tags">
+            {% for member in top_members %}
+                <a href="#">{{ member.username }}</a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="footer"></div>
+
+    <script src="{% static 'js/bootstrap.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
