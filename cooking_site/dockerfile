@@ -1,0 +1,23 @@
+#Python
+FROM python:3.12-slim
+
+ENV PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+# Копируем файл с зависимостями
+COPY requirements.txt .
+
+# Устанавливаем зависимости
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Копируем весь код проекта в контейнер
+COPY . .
+
+# Создаем директории для статики и загрузок
+RUN mkdir -p /app/static /app/uploads
+
+EXPOSE 8000
+
+# Команда для запуска сервера
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
