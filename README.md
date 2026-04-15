@@ -27,14 +27,16 @@
 
 1. Клонируйте Репозиторий
 
-2. Создайте и активируйте виртуальное окружение внутри папки проекта (python -m venv venv 
-venv\Scripts\activate)
+2. Создайте и активируйте виртуальное окружение внутри папки проекта (python -m venv cooking_site 
+cooking_site\Scripts\activate)
 
-3. Установите зависимости pip install -r requirements.txt
+3. Скопируйте .env.example в .env (cp .env.example .env)
 
-4. Примените миграции (python manage.py migrate)
+4. Установите зависимости pip install -r requirements.txt
 
-5. Запустите сервер (python manage.py runserver)
+5. Примените миграции (python manage.py migrate)
+
+6. Запустите сервер (python manage.py runserver)
 
 
 
