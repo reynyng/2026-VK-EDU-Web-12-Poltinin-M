@@ -39,7 +39,6 @@ h1 {
     margin: auto 20px;
     text-align: center;
     color: rgb(0, 0, 0, 0.5);
-    width: 20%;
     background-color: #ffffff;
     border: 1px solid #333;
 }
@@ -47,7 +46,7 @@ h1 {
 .button{
     padding: 5px;
     margin: 20px;
-    width: 20%;
+    font-size: small;
     text-align: center;
     background-color: aqua;
     border: 1px solid black;
@@ -62,6 +61,12 @@ h1 {
     justify-content: center;
     border: 1px solid black;
     border-radius: 12px;
+}
+
+.log-box{
+    display: flex;
+    justify-content: space-around;
+    gap: 10px;
 }
 
 .box_without_border{
@@ -198,12 +203,12 @@ h1 {
     }
     
     .line {
-        width: 90%;
+        width: 70%;
         margin: 10px auto;
     }
     
     .button {
-        width: 50%;
+        padding: 5px 10px;
         margin: 10px auto;
     }
     
@@ -237,12 +242,13 @@ h1 {
     }
     
     .line {
-        width: 60%;
-        margin: auto;
+        width: 45%;
+        margin: 15px;
+        padding: 0 30px;
     }
     
     .button {
-        width: 15%;
+        max-width: 500px;
     }
     
 }

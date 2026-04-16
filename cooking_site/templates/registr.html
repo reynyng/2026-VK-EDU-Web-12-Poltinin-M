@@ -5,6 +5,7 @@
 
 {% block extra_css %}
 <link href="{% static 'css/avatar.css' %}" rel="stylesheet" type="text/css" />
+<link href="{% static 'css/avatar.css' %}" rel="stylesheet" type="text/css" />
 {% endblock %}
 
 {% block content %}
@@ -35,7 +36,7 @@
         <label for="password1">Пароль <span class="required-star">*</span></label>
         <input type="password" id="password1" name="password1" 
                placeholder="Создайте пароль" required>
-        <span class="field-hint">Минимум 6 символов</span>
+        <span class="field-hint">Минимум 8 символов</span>
         {% if form.password1.errors %}
             <error class="required-star">{{ form.password1.errors.0 }}</error>
         {% endif %}
@@ -65,7 +66,7 @@
         </div>
     </div>
     
-    <button type="submit" class="button">Зарегистрироваться</button>
+    <button type="submit" class="submit-btn" style="margin: 20px">Зарегистрироваться</button>
     
     <div class="box_without_border" style="gap: 20px; justify-content: flex-start;">
         <p>Уже есть аккаунт? <a href="{% url 'app:login' %}">Войдите</a></p>

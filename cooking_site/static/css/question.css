@@ -1,7 +1,8 @@
 .question-form {
             width: 100%;
             max-width: 800px;
-            margin: 0 auto;
+            margin: 0 30px;
+
         }
         
         .form-group {
@@ -19,7 +20,7 @@
         .form-group input,
         .form-group textarea,
         .form-group select {
-            width: 100%;
+            width: 80%;
             padding: 12px;
             border: 2px solid #ddd;
             border-radius: 8px;
@@ -71,7 +72,7 @@
         .submit-btn {
             background: #4caf50;
             color: white;
-            line-height: 44px
+            line-height: 44px;
         }
         
         .cancel-btn {
@@ -107,7 +108,7 @@
             }
             
             .submit-btn, .cancel-btn, .preview-btn {
-                width: 100%;
+                width: 70%;
                 text-align: center;
             }
             
@@ -115,4 +116,5 @@
                 flex-direction: column;
                 gap: 25px;
             }
+
         }

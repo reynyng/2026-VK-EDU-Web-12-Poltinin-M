@@ -14,31 +14,36 @@
     <div class="header">
         <h1><a href="{% url 'app:home' %}" style="color: white;">Домашняя книга рецептов</a></h1>
         <div class="search">
-            <input type="text" id="seek" name="seek" placeholder="введите запрос" required class="line">
+        <div class="box_without_border"><input type="text" class="line" id="seek" name="seek" placeholder="введите запрос">
             <a href="{% url 'app:ask' %}" class="button">
                 Задать вопрос
             </a>
-            <div class="guest-avatar">
-                {% if user.avatar %}
-                    <img src="{{ user.avatar.url }}" alt="Аватар" class="avatar-img">
-                {% else %}
-                    <img src="{% static 'img/images.png' %}" alt="Гость" class="avatar-img">
-                {% endif %}
-            </div>
-            <div class="user-guest">
-                {% if user.is_authenticated %}
-                    {{ user.username }}
-                    <div class="regestration">
-                        <a href="{% url 'app:profile_edit' %}" class="login-btn">Профиль</a>
-                        <a href="{% url 'app:logout' %}" class="register-btn">Выйти</a>
-                    </div>
-                {% else %}
-                    guest
-                    <div class="regestration">
-                        <a href="{% url 'app:login' %}" class="login-btn">Вход</a>
-                        <a href="{% url 'app:signup' %}" class="register-btn">Регистрация</a>
-                    </div>
-                {% endif %}
+        </div>    
+            
+            <div class="log-box">
+                <div class="guest-avatar">
+                    {% if user.avatar %}
+                        <img src="{{ user.avatar.url }}" alt="Аватар" class="avatar-img">
+                    {% else %}
+                        <img src="{% static 'img/images.png' %}" alt="Гость" class="avatar-img">
+                    {% endif %}
+                </div>
+                <div class="user-guest">
+                    {% if user.is_authenticated %}
+                        {{ user.username }}
+                        <!-- Заготовка на будущее 
+                            <div class="regestration">
+                            <a href="#" class="login-btn">Профиль</a>
+                            <a href="#" class="register-btn">Выйти</a>
+                        </div> -->
+                    {% else %}
+                        <div style="text-align: center; font-style: italic;"> guest</div>
+                        <div class="regestration">
+                            <a href="{% url 'app:login' %}" class="login-btn">Вход</a>
+                            <a href="{% url 'app:signup' %}" class="register-btn">Регистрация</a>
+                        </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>

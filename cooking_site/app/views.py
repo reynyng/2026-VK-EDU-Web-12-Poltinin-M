@@ -101,7 +101,6 @@ def question_detail_view(request, question_id):
     question = next((q for q in questions if q['id'] == question_id), None)
     
     if not question:
-        # Вернуть 404, если вопрос не найден
         from django.http import Http404
         raise Http404("Вопрос не найден")
     
@@ -130,13 +129,14 @@ def login_view(request):
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
-            user = authenticate(username=username, password=password)
-            if user is not None:
-                login(request, user)
-                next_url = request.GET.get('next', reverse('home'))
-                return redirect(next_url)
+            # username = form.cleaned_data.get('username')
+            # password = form.cleaned_data.get('password')
+            # user = authenticate(username=username, password=password)
+            # if user is not None:
+            #     login(request, user)
+            #     next_url = request.GET.get('next', reverse('home'))
+            #     return redirect(next_url)
+            return redirect(reverse('home'))
     else:
         form = AuthenticationForm()
     
@@ -159,15 +159,12 @@ def login_view(request):
 def signup_view(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
+        if form.is_valid() :
             return redirect(reverse('home'))
     else:
         form = UserCreationForm()
     
     context = {
-        'form': form,
         'popular_tags': [
             {'name': 'Овощи', 'color': 'rgb(0, 255, 55)'},
             {'name': 'Фрукты', 'color': 'rgb(250, 67, 11)'},
@@ -184,7 +181,6 @@ def signup_view(request):
 
 def ask_view(request):
     if request.method == 'POST':
-        # Здесь будет сохранение вопроса в базу данных
         return redirect(reverse('home'))
     
     context = {
