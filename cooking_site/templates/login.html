@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Вход - Домашняя книга рецептов{% endblock %}
+
+{% block content %}
+<div style="flex-wrap: wrap; margin-left: 20px; justify-content: flex-start;">
+    <div class="h2_custom">Вход в аккаунт</div>
+    <p>Войдите, чтобы делиться рецептами и оценивать другие</p>
+    
+    <form method="post">
+        {% csrf_token %}
+        <div class="box_without_border" style="justify-content: flex-start; margin: 20px; gap: 10px;">
+            <label for="username">Имя пользователя или Email</label>
+            <input type="text" id="username" name="username" 
+                   placeholder="username@example.ru" required>
+        </div>
+        
+        <div class="box_without_border" style="justify-content: flex-start; margin: 20px; gap: 10px">
+            <label for="password">Пароль</label>
+            <input type="password" id="password" name="password" 
+                   placeholder="••••••••" required>
+            {% if form.errors %}
+                <error class="required-star">Неверное имя пользователя или пароль</error>
+            {% endif %}
+        </div>
+        
+        <div class="form-options">
+            <label class="remember-checkbox">
+                <input type="checkbox" name="remember"> Запомнить меня
+            </label>
+            <a href="#" class="forgot-link">Забыли пароль?</a>
+        </div>
+        
+        <button type="submit" style="margin: 10px">Войти</button>
+    </form>
+    
+    <div>
+        <p>Нет аккаунта? <a href="{% url 'app:signup' %}">Зарегистрируйтесь</a></p>
+    </div>
+</div>
+{% endblock %}

@@ -162,7 +162,7 @@ h1 {
 @media screen and (max-width: 1199px) and (min-width: 768px) {
     .custom_container {
         display: grid;
-        grid-template: "header header" 120px
+        grid-template: "header header" 130px
                        "main side" auto
                        "footer footer" 50px
                        / 2fr 1fr;
@@ -229,7 +229,7 @@ h1 {
 @media screen and (min-width: 1200px) {
    .custom_container{
     display: grid;
-    grid-template: "header header" 125px
+    grid-template: "header header" 130px
                     "main side" auto
                     "footer footer" 50px
                     /3fr 1fr;
@@ -243,7 +243,6 @@ h1 {
     
     .line {
         width: 45%;
-        margin: 15px;
         padding: 0 30px;
     }
     

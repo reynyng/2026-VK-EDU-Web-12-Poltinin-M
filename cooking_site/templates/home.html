@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Главная - Домашняя книга рецептов{% endblock %}
+
+{% block content %}
+<div class="line2">
+    <div class="h2">
+        Новые вопросы
+    </div>
+    <a href="{% url 'app:hot' %}" style="text-decoration: underline;">
+        Самые популярные вопросы
+    </a>
+</div>
+
+{% for question in questions %}
+<div class="box">
+    <div class="user_question">
+        {% if question.author.avatar %}
+            <img src="{{ question.author.avatar.url }}" alt="Аватар" class="avatar-img">
+        {% else %}
+            <img src="{% static 'img/images.png' %}" alt="Гость" class="avatar-img">
+        {% endif %}
+        <div class="like-counter" data-id="{{ question.id }}">
+            <div class="like-buttons">
+                <button class="like-btn" data-type="like" data-id="{{ question.id }}">+</button>
+                <button class="dislike-btn" data-type="dislike" data-id="{{ question.id }}"> - </button>
+            </div>
+            <span class="likes-count">{{ question.rating }}</span>
+        </div>
+    </div>
+    <div class="text_question">
+        <p>
+            <a href="{% url 'app:question_detail' question_id=question.id %}" 
+               style="text-decoration: underline;" class="h2_custom">
+                {{ question.title }}
+            </a>
+        </p>
+        <p>{{ question.text|truncatewords:30 }}</p>
+        <div class="line_box_question">
+            <a href="{% url 'app:question_detail' question_id=question.id %}" 
+               style="text-decoration: underline;">
+                Ответы ({{ question.answer_count }})
+            </a>
+            <div>
+                Тэги: 
+                {% for tag in question.tags %}
+                    <a href="{% url 'app:tag_questions' tag_name=tag %}" 
+                       style="text-decoration: underline;">
+                        {{ tag }}{% if not forloop.last %},{% endif %}
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% empty %}
+<div class="box">
+    <p>Вопросов пока нет. Будьте первым!</p>
+</div>
+{% endfor %}
+
+{% include 'pagination.html' with page=page %}
+{% endblock %}
