@@ -13,7 +13,7 @@
                     <button class="like-btn {% if user_like and user_like.is_like %}liked{% endif %}" 
                             data-type="like" data-id="{{ question.id }}">+</button>
                     <button class="dislike-btn {% if user_like and not user_like.is_like %}disliked{% endif %}" 
-                            data-type="dislike" data-id="{{ question.id }}"> - </button>
+                            data-type="dislike" data-id="{{ question.id }}">-</button>
                 </div>
             {% endif %}
             <span class="likes-count">{{ question.likes_count|default:0 }}</span>
@@ -35,38 +35,53 @@
 
 <hr>
 
-<div class="h1">Ответы ({{ question.answers_count }})</div>
+<div class="h2_custom" style="margin-left: 30px; font-size: 24px;">Ответы ({{ question.answers_count }})</div>
 
 {% for answer in answers %}
-<div class="box" data-answer-id="{{ answer.id }}">
-    <div class="user_question">
-        <img src="{% static 'img/images.png' %}" alt="Аватар" class="avatar-img">
-        <div class="like-counter" data-id="{{ answer.id }}">
+<div class="box" style="display: flex; align-items: stretch; gap: 15px; padding: 15px;">
+    <!-- Левая колонка: аватар и лайки -->
+    <div class="user_question" style="display: flex; flex-direction: column; align-items: center; gap: 15px; min-width: 80px;">
+        <img src="{% static 'img/images.png' %}" alt="Аватар" class="avatar-img" style="margin: 0;">
+        <div class="like-counter" data-id="{{ answer.id }}" style="flex-direction: column; gap: 8px;">
             {% if user.is_authenticated %}
-                <div class="like-buttons">
-                    <button class="like-btn answer-like" data-type="like" data-id="{{ answer.id }}">+</button>
-                    <button class="dislike-btn answer-dislike" data-type="dislike" data-id="{{ answer.id }}"> - </button>
+                <div class="like-buttons" style="gap: 8px;">
+                    <button class="like-btn answer-like {% if answer.user_liked == True %}liked{% endif %}" 
+                            data-type="like" data-id="{{ answer.id }}">+</button>
+                    <button class="dislike-btn answer-dislike {% if answer.user_liked == False %}disliked{% endif %}" 
+                            data-type="dislike" data-id="{{ answer.id }}">-</button>
                 </div>
             {% endif %}
             <span class="likes-count">{{ answer.likes_count|default:0 }}</span>
         </div>
     </div>
-    <div class="text_question">
-        <p>{{ answer.text }}</p>
-        <div class="line_box_question">
-            <small>Автор: {{ answer.author.username }}</small>
-            {% if user.is_authenticated and user == question.author %}
-                <label class="correct-buttons">
-                    <input type="checkbox" 
-                           class="correct-checkbox" 
-                           data-answer-id="{{ answer.id }}"
-                           {% if answer.is_helpful %}checked{% endif %}>
-                    <span>Ответ помог!</span>
-                </label>
-            {% elif answer.is_helpful %}
-                <span class="correct-btn correct">✓</span>
-                <span>Ответ помог автору</span>
-            {% endif %}
+    
+    <!-- Правая колонка: текст ответа и информация -->
+    <div class="text_question" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+        <div style="margin-bottom: 15px;">
+            {{ answer.text }}
+        </div>
+        
+        <div class="line_box_question" style="justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid #eee; gap: 15px;">
+            <div>
+                <small>Автор: {{ answer.author.username }}</small>
+            </div>
+            <div>
+                {% if user.is_authenticated and user == question.author %}
+                    <label class="correct-buttons" style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 5px 10px;">
+                        <input type="checkbox" 
+                               class="correct-checkbox" 
+                               data-answer-id="{{ answer.id }}"
+                               {% if answer.is_helpful %}checked{% endif %}
+                               style="margin: 0; width: 18px; height: 18px;">
+                        <span>Ответ помог!</span>
+                    </label>
+                {% elif answer.is_helpful %}
+                    <span style="display: inline-flex; align-items: center; gap: 8px;">
+                        <span class="correct-btn correct" style="display: inline-block; text-align: center; line-height: 30px; width: 30px; height: 30px;">✓</span>
+                        <span>Ответ помог автору</span>
+                    </span>
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>
@@ -81,24 +96,44 @@
 {% include 'pagination.html' with page=page %}
 
 {% if user.is_authenticated %}
-    <form method="post">
+    <form method="post" style="margin-top: 20px;">
         {% csrf_token %}
+        <div class="box_without_border" style="flex-direction: column;">
         <textarea name="text" class="box" 
                   placeholder="Введите ваш ответ..." 
-                  style="width: 100%; min-height: 100px; margin: 10px 0; padding: 10px;" 
+                  style="width: 100%; min-height: 100px; margin: 10px 0; padding: 15px; border-radius: 12px;" 
                   required></textarea>
-        <div class="form-actions">
-            <button type="submit" class="submit-btn">Отправить ответ</button>
-            <a href="{% url 'app:home' %}" class="cancel-btn">Отмена</a>
+        <div class="form-actions" style="display: flex; gap: 15px; margin-top: 15px;">
+            <div class="box_without_border" style="justify-content: space-around;">
+            <button type="submit" class="submit-btn" style="padding: 12px 24px;">Отправить ответ</button>
+            <a href="{% url 'app:home' %}" class="cancel-btn" style="padding: 12px 24px;">Отмена</a>
+            </div>
         </div>
     </form>
 {% else %}
-    <div class="box">
-        <div class="text_question" style="text-align: center;">
+    <div class="box" style="margin-top: 20px;">
+        <div class="text_question" style="text-align: center; padding: 20px;">
             <p><a href="{% url 'login_app:login' %}">Войдите</a> или <a href="{% url 'login_app:signup' %}">зарегистрируйтесь</a>, чтобы оставить ответ</p>
         </div>
     </div>
-{% endif %}
+    {% endif %}
+</div>
+<style>
+    .box {
+        margin-bottom: 20px;
+    }
+    .like-btn, .dislike-btn {
+        margin: 0;
+        padding: 0;
+    }
+    .correct-buttons {
+        background-color: #f5f5f5;
+        border-radius: 6px;
+    }
+    .correct-buttons:hover {
+        background-color: #e8f5e9;
+    }
+</style>
 
 <script>
 function getCookie(name) {
