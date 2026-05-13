@@ -3,14 +3,61 @@
 
 {% block title %}Редактирование профиля - Домашняя книга рецептов{% endblock %}
 
+{% block extra_css %}
+<link href="{% static 'css/avatar.css' %}" rel="stylesheet" type="text/css" />
+<style>
+    .avatar-preview-current {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        overflow: hidden;
+        margin-bottom: 15px;
+    }
+    .avatar-preview-current img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="h2_custom" style="margin-left: 30px;">Редактирование профиля</div>
 
-<form method="post">
+<form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     
     <div class="box_without_border" style="flex-direction: column; align-items: flex-start; gap: 20px;">
         
+        <!-- Текущий аватар -->
+        <div style="width: 100%;">
+            <label>Текущий аватар</label>
+            <div class="avatar-preview-current">
+                {% if profile.avatar %}
+                    <img src="{{ profile.avatar.url }}" alt="Текущий аватар">
+                {% else %}
+                    <img src="{% static 'img/images.png' %}" alt="Аватар по умолчанию">
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Новый аватар -->
+        <div style="width: 100%;">
+            <label for="avatar">Изменить аватар</label>
+            <div class="avatar-upload" style="margin-top: 10px;">
+                <div class="avatar-preview" id="avatarPreview">
+                    <img src="{% static 'img/images.png' %}" alt="Предпросмотр" class="preview-img">
+                </div>
+                <div class="avatar-controls">
+                    <label for="avatar" class="button-small">Выбрать файл</label>
+                    <input type="file" id="avatar" name="avatar" 
+                           accept="image/jpeg,image/png,image/gif" style="display: none;">
+                    <span class="field-hint">Рекомендуемый размер: 200x200px. JPEG, PNG, GIF до 2MB</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Email -->
         <div style="width: 100%;">
             <label for="email">Электронная почта</label>
             <input type="email" id="email" name="email" 
@@ -20,6 +67,7 @@
 
         <hr style="width: 100%; margin: 20px 0;">
 
+        <!-- Смена пароля -->
         <h3>Смена пароля</h3>
         
         <div style="width: 100%;">
@@ -34,7 +82,7 @@
             <input type="password" id="new_password1" name="new_password1" 
                    placeholder="Введите новый пароль"
                    style="width: 100%; padding: 10px; margin-top: 5px;">
-            <small style="font-size: 12px; color: #666;">Минимум 8 символов</small>
+            <small class="field-hint" style="font-size: 12px; color: #666;">Минимум 8 символов</small>
         </div>
 
         <div style="width: 100%;">
@@ -44,10 +92,26 @@
                    style="width: 100%; padding: 10px; margin-top: 5px;">
         </div>
 
+        <!-- Кнопки -->
         <div style="display: flex; gap: 15px; margin-top: 20px;">
             <button type="submit" class="submit-btn">Сохранить изменения</button>
             <a href="{% url 'login_app:profile' %}" class="cancel-btn">Отмена</a>
         </div>
     </div>
 </form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById('avatar').addEventListener('change', function(e) {
+        const reader = new FileReader();
+        reader.onload = function() {
+            const preview = document.querySelector('#avatarPreview .preview-img');
+            preview.src = reader.result;
+        }
+        if (e.target.files[0]) {
+            reader.readAsDataURL(e.target.files[0]);
+        }
+    });
+</script>
 {% endblock %}

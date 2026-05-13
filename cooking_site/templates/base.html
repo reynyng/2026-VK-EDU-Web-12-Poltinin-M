@@ -22,7 +22,11 @@
             
             <div class="log-box">
                 <div class="guest-avatar">
-                    <img src="{% static 'img/images.png' %}" alt="Гость" class="avatar-img">
+                    {% if user.is_authenticated and user.profile.avatar %}
+                        <img src="{{ user.profile.avatar.url }}" alt="Аватар" class="avatar-img">
+                    {% else %}
+                        <img src="{% static 'img/images.png' %}" alt="Гость" class="avatar-img">
+                    {% endif %}
                 </div>
                 <div class="user-guest">
                     {% if user.is_authenticated %}
@@ -44,14 +48,12 @@
     </div>
 
     <div class="main">
-        <!-- Сообщения теперь внутри main, над контентом -->
         {% if messages %}
             <div class="messages-container" style="margin: 10px 20px;">
                 {% for message in messages %}
                     <div class="alert" style="padding: 10px 15px; margin-bottom: 10px; border-radius: 5px; 
                                 {% if message.tags == 'success' %}background: #d4edda; color: #155724; border: 1px solid #c3e6cb;
                                 {% elif message.tags == 'error' %}background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;
-                                {% elif message.tags == 'info' %}background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb;
                                 {% else %}background: #fff3cd; color: #856404; border: 1px solid #ffeeba;{% endif %}">
                         {{ message }}
                     </div>
@@ -82,6 +84,27 @@
 
     <div class="footer"></div>
 
+    <!-- CSRF токен для AJAX запросов -->
+    <script>
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        const csrftoken = getCookie('csrftoken');
+        
+        // Настройка всех AJAX запросов с CSRF токеном
+        window.csrftoken = csrftoken;
+    </script>
     <script src="{% static 'js/bootstrap.js' %}"></script>
     {% block extra_js %}{% endblock %}
 </body>

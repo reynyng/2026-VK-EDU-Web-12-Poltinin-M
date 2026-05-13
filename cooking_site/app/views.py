@@ -168,23 +168,27 @@ def ask_view(request):
 @login_required
 @require_POST
 def question_like_view(request, question_id):
-    """Оценка вопроса (лайк/дизлайк)"""
+    """Лайк/дизлайк вопроса (AJAX)"""
     question = get_object_or_404(Question, id=question_id)
     is_like = request.POST.get('is_like') == 'true'
     
+    # Проверяем существующий лайк
     existing_like = QuestionLike.objects.filter(
         user=request.user, question=question
     ).first()
     
     if existing_like:
         if existing_like.is_like == is_like:
+            # Удаляем лайк (отмена)
             existing_like.delete()
             liked = None
         else:
+            # Меняем тип лайка
             existing_like.is_like = is_like
             existing_like.save()
             liked = is_like
     else:
+        # Создаем новый лайк
         QuestionLike.objects.create(
             user=request.user,
             question=question,
@@ -192,10 +196,10 @@ def question_like_view(request, question_id):
         )
         liked = is_like
     
-    # Обновляем рейтинг вопроса
+    # Обновляем рейтинг
     question.update_rating()
     
-    # Получаем актуальные значения
+    # Возвращаем новый рейтинг и состояние
     likes_count = question.question_likes.filter(is_like=True).count()
     dislikes_count = question.question_likes.filter(is_like=False).count()
     
@@ -204,14 +208,14 @@ def question_like_view(request, question_id):
         'rating': question.rating,
         'likes_count': likes_count,
         'dislikes_count': dislikes_count,
-        'liked': liked
+        'liked': liked  # true - лайк, false - дизлайк, null - нет оценки
     })
 
 
 @login_required
 @require_POST
 def answer_like_view(request, answer_id):
-    """Оценка ответа (лайк/дизлайк)"""
+    """Лайк/дизлайк ответа (AJAX)"""
     answer = get_object_or_404(Answer, id=answer_id)
     is_like = request.POST.get('is_like') == 'true'
     
@@ -235,10 +239,8 @@ def answer_like_view(request, answer_id):
         )
         liked = is_like
     
-    # Обновляем рейтинг ответа
     answer.update_rating()
     
-    # Получаем актуальные значения
     likes_count = answer.answer_likes.filter(is_like=True).count()
     dislikes_count = answer.answer_likes.filter(is_like=False).count()
     
@@ -250,18 +252,22 @@ def answer_like_view(request, answer_id):
         'liked': liked
     })
 
+
 @login_required
 @require_POST
 def mark_helpful_view(request, answer_id):
+    """Отметка 'ответ помог' (только автор вопроса)"""
     answer = get_object_or_404(Answer, id=answer_id)
     question = answer.question
     
+    # Проверяем, что текущий пользователь - автор вопроса
     if request.user != question.author:
         return JsonResponse({
             'success': False,
             'error': 'Только автор вопроса может отмечать ответы как "помог"'
         }, status=403)
     
+    # Переключаем статус (можно несколько ответов)
     is_helpful = request.POST.get('is_helpful') == 'true'
     answer.is_helpful = is_helpful
     answer.save()

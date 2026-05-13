@@ -3,10 +3,14 @@
 
 {% block title %}Регистрация - Домашняя книга рецептов{% endblock %}
 
+{% block extra_css %}
+<link href="{% static 'css/avatar.css' %}" rel="stylesheet" type="text/css" />
+{% endblock %}
+
 {% block content %}
 <div class="h2_custom" style="margin-left: 30px;">Создание аккаунта</div>
 
-<form method="post">
+<form method="post" enctype="multipart/form-data" action="{% url 'login_app:signup' %}">
     {% csrf_token %}
     
     <div class="box_without_border" style="gap: 20px; justify-content: flex-start; flex-direction: column;">
@@ -45,12 +49,42 @@
                 <div class="errorlist" style="color: red;">{{ form.password2.errors.0 }}</div>
             {% endif %}
         </div>
+
+        <div style="width: 100%;">
+            <label for="avatar">Аватар профиля</label>
+            <div class="avatar-upload" style="margin-top: 10px;">
+                <div class="avatar-preview" id="avatarPreview">
+                    <img src="{% static 'img/images.png' %}" alt="Предпросмотр аватара" class="preview-img">
+                </div>
+                <div class="avatar-controls">
+                    <label for="avatar" class="button-small">Выбрать файл</label>
+                    <input type="file" id="avatar" name="avatar" 
+                           accept="image/jpeg,image/png,image/gif" style="display: none;">
+                    <span class="field-hint">Рекомендуемый размер: 200x200px. JPEG, PNG, GIF до 2MB</span>
+                </div>
+            </div>
+        </div>
     </div>
     
-    <button type="submit" class="submit-btn" style="margin: 20px 20px;">Зарегистрироваться</button>
+    <button type="submit" class="submit-btn" style="margin: 20px 0;">Зарегистрироваться</button>
     
     <div>
-        <p style="margin: 0 20px;">Уже есть аккаунт? <a href="{% url 'login_app:login' %}">Войдите</a></p>
+        <p>Уже есть аккаунт? <a href="{% url 'login_app:login' %}">Войдите</a></p>
     </div>
 </form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById('avatar').addEventListener('change', function(e) {
+        const reader = new FileReader();
+        reader.onload = function() {
+            const preview = document.querySelector('#avatarPreview .preview-img');
+            preview.src = reader.result;
+        }
+        if (e.target.files[0]) {
+            reader.readAsDataURL(e.target.files[0]);
+        }
+    });
+</script>
 {% endblock %}

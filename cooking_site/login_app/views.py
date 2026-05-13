@@ -55,10 +55,15 @@ def signup_view(request):
             user = form.save()
             
             email = request.POST.get('email', '')
+            avatar = request.FILES.get('avatar')
             
-            if email:
-                user.email = email
-                user.save()
+            user.email = email
+            user.save()
+            
+            profile = user.profile
+            if avatar:
+                profile.avatar = avatar
+                profile.save()
             
             login(request, user)
             messages.success(request, f'Добро пожаловать, {user.username}!')
@@ -127,14 +132,24 @@ def profile_edit_view(request):
     
     if request.method == 'POST':
         email = request.POST.get('email')
+        avatar = request.FILES.get('avatar')
         old_password = request.POST.get('old_password')
         new_password1 = request.POST.get('new_password1')
         new_password2 = request.POST.get('new_password2')
         
+        # Обновляем email
         if email and email != user.email:
             user.email = email
             user.save()
         
+        # Обновляем аватар
+        if avatar:
+            if profile.avatar:
+                profile.avatar.delete()
+            profile.avatar = avatar
+            profile.save()
+        
+        # Смена пароля
         if old_password and new_password1 and new_password2:
             if user.check_password(old_password):
                 if new_password1 == new_password2:
