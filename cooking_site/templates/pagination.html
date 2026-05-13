@@ -1,0 +1,50 @@
+<div class="pagination-wrapper">
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            {% if page.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">
+                        &laquo; Первая
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">
+                        Назад
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" tabindex="-1">Назад</a>
+                </li>
+            {% endif %}
+
+            <li class="page-item {% if page.number == page.number %}active{% endif %}">
+                <a class="page-link" href="#">{{ page.number }}</a>
+            </li>
+
+            {% if page.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">
+                        {{ page.next_page_number }}
+                    </a>
+                </li>
+                {% if page.next_page_number|add:1 <= page.paginator.num_pages %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page.next_page_number|add:1 }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">
+                            {{ page.next_page_number|add:1 }}
+                        </a>
+                    </li>
+                {% endif %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">
+                        Вперед
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" href="#">Вперед</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
