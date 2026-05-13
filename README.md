@@ -34,10 +34,11 @@ cooking_site\Scripts\activate)
 
 4. Установите зависимости pip install -r requirements.txt
 
-5. Примените миграции (python manage.py migrate)
+5. Примените миграции (сначала python manage.py makemigrations, затем python manage.py migrate)
 
 6. Запустите сервер (python manage.py runserver)
 
+7. *Если хотите создать базу данных из пользователей, можете воспользоваться командой python manage.py runserver [ratio]Б где в ratio указываете количество пользователей, которое хотите добавить.
 
 
 

@@ -11,32 +11,31 @@
     <form method="post">
         {% csrf_token %}
         <div class="box_without_border" style="justify-content: flex-start; margin: 20px; gap: 10px;">
-            <label for="username">Имя пользователя или Email</label>
+            <label for="username">Имя пользователя</label>
             <input type="text" id="username" name="username" 
-                   placeholder="username@example.ru" required>
+                   value="{{ request.POST.username|default:'' }}"
+                   placeholder="Введите имя пользователя" required>
         </div>
         
         <div class="box_without_border" style="justify-content: flex-start; margin: 20px; gap: 10px">
             <label for="password">Пароль</label>
             <input type="password" id="password" name="password" 
-                   placeholder="••••••••" required>
-            {% if form.errors %}
-                <error class="required-star">Неверное имя пользователя или пароль</error>
-            {% endif %}
+                   placeholder="Введите пароль" required>
         </div>
         
-        <div class="form-options">
-            <label class="remember-checkbox">
-                <input type="checkbox" name="remember"> Запомнить меня
-            </label>
-            <a href="#" class="forgot-link">Забыли пароль?</a>
-        </div>
+        {% if messages %}
+            <div class="error-message" style="color: red; margin: 10px 20px;">
+                {% for message in messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
         
-        <button type="submit" style="margin: 10px">Войти</button>
+        <button type="submit" style="margin: 10px; padding: 10px 20px;">Войти</button>
     </form>
     
     <div>
-        <p>Нет аккаунта? <a href="{% url 'app:signup' %}">Зарегистрируйтесь</a></p>
+        <p>Нет аккаунта? <a href="{% url 'login_app:signup' %}">Зарегистрируйтесь</a></p>
     </div>
 </div>
 {% endblock %}

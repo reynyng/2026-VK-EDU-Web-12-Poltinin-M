@@ -13,7 +13,8 @@
         Создание нового вопроса
     </div>
     
-    <form class="question-form" method="post">
+    <form class="question-form" method="post" action="{% url 'app:ask' %}">
+        {% csrf_token %}
         <div class="form-group">
             <label for="title">
                 Заголовок <span class="required-star">*</span>
@@ -42,7 +43,7 @@
         </div>
         
         <div class="form-actions">
-            <div type="submit" class="submit-btn">Опубликовать вопрос</div>
+            <button type="submit" class="submit-btn">Опубликовать вопрос</button>
             <a href="{% url 'app:home' %}" class="cancel-btn">Отмена</a>
         </div>
     </form>
