@@ -6,7 +6,6 @@
 {% block content %}
 <div class="box_without_border">
     <div class="user_question">
-        <!-- Аватар автора вопроса -->
         {% if question.author.profile.avatar %}
             <img src="{{ question.author.profile.avatar.url }}" alt="Аватар" class="avatar-img_question">
         {% else %}
@@ -136,7 +135,6 @@ function getCookie(name) {
 const csrftoken = getCookie('csrftoken');
 
 {% if user.is_authenticated %}
-// Лайки для вопросов
 document.querySelectorAll('.like-btn:not(.answer-like), .dislike-btn:not(.answer-dislike)').forEach(btn => {
     btn.addEventListener('click', function() {
         const isLike = this.classList.contains('like-btn');
@@ -172,7 +170,6 @@ document.querySelectorAll('.like-btn:not(.answer-like), .dislike-btn:not(.answer
     });
 });
 
-// Лайки для ответов
 document.querySelectorAll('.answer-like, .answer-dislike').forEach(btn => {
     btn.addEventListener('click', function() {
         const isLike = this.classList.contains('answer-like');
@@ -208,7 +205,6 @@ document.querySelectorAll('.answer-like, .answer-dislike').forEach(btn => {
     });
 });
 
-// Checkbox "Ответ помог"
 document.querySelectorAll('.correct-checkbox').forEach(checkbox => {
     checkbox.addEventListener('change', function() {
         const answerId = this.dataset.answerId;
