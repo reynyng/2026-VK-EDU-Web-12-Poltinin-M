@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: cooking_site_web
+    command: python manage.py runserver 0.0.0.0:8000
+    
+    volumes:
+      - .:/app
+      - uploads_volume:/app/uploads
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=True
+      - SECRET_KEY=docker-secret-key-for-development
+      - ALLOWED_HOSTS=localhost,127.0.0.1
+    env_file:
+      - .env
+volumes:
+  uploads_volume:
