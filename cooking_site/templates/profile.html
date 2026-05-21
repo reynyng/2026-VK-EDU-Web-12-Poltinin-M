@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Профиль - Домашняя книга рецептов{% endblock %}
+
+{% block extra_css %}
+<link href="{% static 'css/avatar.css' %}" rel="stylesheet" type="text/css" />
+<link href="{% static 'css/profile.css' %}" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block content %}
+<div class="h2_custom" style="margin-left: 30px;">Мой профиль</div>
+
+<div class="box_without_border" style="flex-direction: column; align-items: flex-start; gap: 15px;">
+
+    <div class="avatar-upload">
+        <div class="avatar-preview">
+            {% if profile.avatar %}
+                <img src="{{ profile.avatar.url }}" alt="Аватар" class="preview-img">
+            {% else %}
+                <img src="{% static 'img/images.png' %}" alt="Аватар по умолчанию" class="preview-img">
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="box_without_border" style="gap: 15px; justify-content: flex-start; flex-wrap: wrap;">
+        <div style="min-width: 200px;">
+            <strong>Имя пользователя:</strong>
+            <div class="box" style="margin-top: 5px;">{{ profile_user.username }}</div>
+        </div>
+        
+        <div style="min-width: 200px;">
+            <strong>Email:</strong>
+            <div class="box" style="margin-top: 5px;">{{ profile_user.email }}</div>
+        </div>
+        
+        <div style="min-width: 200px;">
+            <strong>Зарегистрирован:</strong>
+            <div class="box" style="margin-top: 5px;">{{ profile_user.date_joined|date:"d.m.Y" }}</div>
+        </div>
+    </div>
+
+    <h3 style="margin-top: 20px;">Статистика</h3>
+    <div class="profile-stats">
+        <div class="stat-card">
+            <div class="stat-number">{{ questions_count }}</div>
+            <div class="stat-label">Вопросов</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ answers_count }}</div>
+            <div class="stat-label">Ответов</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ total_rating }}</div>
+            <div class="stat-label">Рейтинг</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ given_likes }}</div>
+            <div class="stat-label">Поставлено оценок</div>
+        </div>
+    </div>
+
+    <div class="profile-actions">
+        <a href="{% url 'login_app:profile_edit' %}" class="button">Редактировать профиль</a>
+        <a href="{% url 'app:home' %}" class="button" style="background-color: #666;">На главную</a>
+    </div>
+</div>
+{% endblock %}

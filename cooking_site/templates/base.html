@@ -1,0 +1,111 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="{% static 'css/bootstrap.css' %}" rel="stylesheet">
+    <link href="{% static 'css/likes.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'css/class.css' %}" rel="stylesheet" type="text/css" />
+    {% block extra_css %}{% endblock %}
+    <title>{% block title %}Домашняя книга рецептов{% endblock %}</title>
+</head>
+
+<body class="custom_container">
+    <div class="header">
+        <h1><a href="{% url 'app:home' %}" style="color: white;">Домашняя книга рецептов</a></h1>
+        <div class="search">
+            <div class="box_without_border">
+                <input type="text" class="line" id="seek" name="seek" placeholder="введите запрос">
+                <a href="{% url 'app:ask' %}" class="button">Задать вопрос</a>
+            </div>    
+            
+            <div class="log-box">
+                <div class="guest-avatar">
+                    {% if user.is_authenticated and user.profile.avatar %}
+                        <img src="{{ user.profile.avatar.url }}" alt="Аватар" class="avatar-img">
+                    {% else %}
+                        <img src="{% static 'img/images.png' %}" alt="Гость" class="avatar-img">
+                    {% endif %}
+                </div>
+                <div class="user-guest">
+                    {% if user.is_authenticated %}
+                        <div class="username">{{ user.username }}</div>
+                        <div class="regestration">
+                            <a href="{% url 'login_app:profile' %}" class="login-btn">Профиль</a>
+                            <a href="{% url 'login_app:logout' %}" class="register-btn">Выйти</a>
+                        </div>
+                    {% else %}
+                        <div style="text-align: center; font-style: italic;"> guest</div>
+                        <div class="regestration">
+                            <a href="{% url 'login_app:login' %}" class="login-btn">Вход</a>
+                            <a href="{% url 'login_app:signup' %}" class="register-btn">Регистрация</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main">
+        {% if messages %}
+            <div class="messages-container" style="margin: 10px 20px;">
+                {% for message in messages %}
+                    <div class="alert" style="padding: 10px 15px; margin-bottom: 10px; border-radius: 5px; 
+                                {% if message.tags == 'success' %}background: #d4edda; color: #155724; border: 1px solid #c3e6cb;
+                                {% elif message.tags == 'error' %}background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;
+                                {% else %}background: #fff3cd; color: #856404; border: 1px solid #ffeeba;{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <div class="side">
+        <h2 class="h2_custom" style="margin-top: 40px;">Популярные теги</h2>
+        <div class="tags">
+            {% for tag in popular_tags %}
+                <a href="{% url 'app:tag_questions' tag_name=tag.name %}" style="color: rgb(100, 100, 255);">
+                    {{ tag.name }}
+                </a>
+            {% endfor %}
+        </div>
+
+        <h2 class="h2_custom" style="margin-top: 20px;">Лучшие пользователи</h2>
+        <div class="users_tags">
+            {% for member in top_members %}
+                <a href="#">{{ member.username }}</a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="footer"></div>
+
+    <!-- CSRF токен для AJAX запросов -->
+    <script>
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        const csrftoken = getCookie('csrftoken');
+        
+        // Настройка всех AJAX запросов с CSRF токеном
+        window.csrftoken = csrftoken;
+    </script>
+    <script src="{% static 'js/bootstrap.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
