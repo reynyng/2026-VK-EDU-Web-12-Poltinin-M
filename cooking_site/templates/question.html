@@ -1,0 +1,340 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ question.title }}{% endblock %}
+
+{% block content %}
+<div class="box_without_border">
+    <div class="user_question">
+        {% if question.author.profile.avatar %}
+            <img src="{{ question.author.profile.avatar.url }}" alt="Аватар" class="avatar-img_question">
+        {% else %}
+            <img src="{% static 'img/images.png' %}" alt="Аватар по умолчанию" class="avatar-img_question">
+        {% endif %}
+        <div class="like-counter" data-id="{{ question.id }}">
+            {% if user.is_authenticated %}
+                <div class="like-buttons">
+                    <button class="like-btn {% if user_like and user_like.is_like %}liked{% endif %}" 
+                            data-type="like" data-id="{{ question.id }}">+</button>
+                    <button class="dislike-btn {% if user_like and not user_like.is_like %}disliked{% endif %}" 
+                            data-type="dislike" data-id="{{ question.id }}">-</button>
+                </div>
+            {% endif %}
+            <span class="likes-count">{{ question.likes_count|default:0 }}</span>
+        </div>
+    </div>
+    <div class="text_question">
+        <p><a class="h2_custom">{{ question.title }}</a></p>
+        <p>{{ question.text }}</p>
+        <div class="line_box_question">
+            <div>
+                Теги:
+                {% for tag in question.tags.all %}
+                    <a href="{% url 'app:tag_questions' tag_name=tag.name %}">{{ tag.name }}{% if not forloop.last %},{% endif %}</a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<div class="h2_custom" style="margin-left: 30px; font-size: 24px;">Ответы (<span id="answers-count">{{ question.answers_count }}</span>)</div>
+
+<div id="answers-list">
+{% for answer in answers %}
+<div class="box">
+    <div class="user_question">
+        <!-- Аватар автора ответа -->
+        {% if answer.author.profile.avatar %}
+            <img src="{{ answer.author.profile.avatar.url }}" alt="Аватар" class="avatar-img">
+        {% else %}
+            <img src="{% static 'img/images.png' %}" alt="Аватар по умолчанию" class="avatar-img">
+        {% endif %}
+        <div class="like-counter" data-id="{{ answer.id }}">
+            {% if user.is_authenticated %}
+                <div class="like-buttons">
+                    <button class="like-btn answer-like {% if answer.user_liked == True %}liked{% endif %}" 
+                            data-type="like" data-id="{{ answer.id }}">+</button>
+                    <button class="dislike-btn answer-dislike {% if answer.user_liked == False %}disliked{% endif %}" 
+                            data-type="dislike" data-id="{{ answer.id }}">-</button>
+                </div>
+            {% endif %}
+            <span class="likes-count">{{ answer.likes_count|default:0 }}</span>
+        </div>
+    </div>
+    <div class="text_question">
+        <p>{{ answer.text }}</p>
+        <div class="line_box_question">
+            <div>
+                <small>Автор: {{ answer.author.username }}</small>
+            </div>
+            <div>
+                {% if user.is_authenticated and user == question.author %}
+                    <label class="correct-buttons">
+                        <input type="checkbox" 
+                               class="correct-checkbox" 
+                               data-answer-id="{{ answer.id }}"
+                               {% if answer.is_helpful %}checked{% endif %}>
+                        <span>Ответ помог!</span>
+                    </label>
+                {% elif answer.is_helpful %}
+                    <span class="correct-btn correct">✓</span>
+                    <span>Ответ помог автору</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% empty %}
+<div class="box" id="no-answers-placeholder">
+    <div class="text_question">
+        <p>Ответов пока нет. Будьте первым!</p>
+    </div>
+</div>
+{% endfor %}
+</div>{# /answers-list #}
+
+{% include 'pagination.html' with page=page %}
+
+{% if user.is_authenticated %}
+    <div class="box_without_border" style="flex-direction: column; align-items: stretch; margin-top: 20px;">
+        <h3 class="h2_custom" style="font-size: 20px; margin-bottom: 15px;">Ваш ответ</h3>
+        <form method="post" style="width: 100%;">
+            {% csrf_token %}
+            <textarea name="text" 
+                      placeholder="Введите ваш ответ..." 
+                      style="width: 100%; min-height: 120px; padding: 15px; border: 2px solid #ddd; border-radius: 12px; font-size: 16px; font-family: inherit; resize: vertical; margin-bottom: 15px; box-sizing: border-box;"></textarea>
+            <div class="form-actions" style="display: flex; gap: 15px; justify-content: flex-start;">
+                <button type="submit" class="submit-btn">Отправить ответ</button>
+                <a href="{% url 'app:home' %}" class="cancel-btn">Отмена</a>
+            </div>
+        </form>
+    </div>
+{% else %}
+    <div class="box">
+        <div class="text_question" style="text-align: center;">
+            <p><a href="{% url 'login_app:login' %}">Войдите</a> или <a href="{% url 'login_app:signup' %}">зарегистрируйтесь</a>, чтобы оставить ответ</p>
+        </div>
+    </div>
+{% endif %}
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+const csrftoken = getCookie('csrftoken');
+
+{% if user.is_authenticated %}
+document.querySelectorAll('.like-btn:not(.answer-like), .dislike-btn:not(.answer-dislike)').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const isLike = this.classList.contains('like-btn');
+        const questionId = this.dataset.id;
+        const container = this.closest('.like-counter');
+        
+        fetch(`/api/question/${questionId}/like/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRFToken': csrftoken },
+            body: `is_like=${isLike}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const likesSpan = container.querySelector('.likes-count');
+                likesSpan.textContent = data.likes_count - data.dislikes_count;
+                
+                const likeBtn = container.querySelector('.like-btn');
+                const dislikeBtn = container.querySelector('.dislike-btn');
+                
+                if (data.liked === true) {
+                    likeBtn.classList.add('liked');
+                    dislikeBtn.classList.remove('disliked');
+                } else if (data.liked === false) {
+                    dislikeBtn.classList.add('disliked');
+                    likeBtn.classList.remove('liked');
+                } else {
+                    likeBtn.classList.remove('liked');
+                    dislikeBtn.classList.remove('disliked');
+                }
+            }
+        });
+    });
+});
+
+document.querySelectorAll('.answer-like, .answer-dislike').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const isLike = this.classList.contains('answer-like');
+        const answerId = this.dataset.id;
+        const container = this.closest('.like-counter');
+        
+        fetch(`/api/answer/${answerId}/like/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRFToken': csrftoken },
+            body: `is_like=${isLike}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const likesSpan = container.querySelector('.likes-count');
+                likesSpan.textContent = data.likes_count - data.dislikes_count;
+                
+                const likeBtn = container.querySelector('.answer-like');
+                const dislikeBtn = container.querySelector('.answer-dislike');
+                
+                if (data.liked === true) {
+                    likeBtn.classList.add('liked');
+                    dislikeBtn.classList.remove('disliked');
+                } else if (data.liked === false) {
+                    dislikeBtn.classList.add('disliked');
+                    likeBtn.classList.remove('liked');
+                } else {
+                    likeBtn.classList.remove('liked');
+                    dislikeBtn.classList.remove('disliked');
+                }
+            }
+        });
+    });
+});
+
+document.querySelectorAll('.correct-checkbox').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+        const answerId = this.dataset.answerId;
+        const isChecked = this.checked;
+        
+        fetch(`/api/answer/${answerId}/helpful/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRFToken': csrftoken },
+            body: `is_helpful=${isChecked}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success) {
+                checkbox.checked = !isChecked;
+                alert(data.error);
+            }
+        });
+    });
+});
+{% endif %}
+</script>
+<script src="https://unpkg.com/centrifuge@5.0.0/dist/centrifuge.js"></script>
+<script>
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function showToast(msg, duration) {
+    duration = duration || 4000;
+    let toast = document.getElementById('realtime-toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'realtime-toast';
+        toast.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#333;color:#fff;padding:12px 20px;border-radius:10px;z-index:9999;font-size:15px;box-shadow:0 4px 16px rgba(0,0,0,.3);transition:opacity .3s ease';
+        document.body.appendChild(toast);
+    }
+    toast.textContent = msg;
+    toast.style.opacity = '1';
+    toast.style.display = 'block';
+    clearTimeout(toast._t);
+    toast._t = setTimeout(function() {
+        toast.style.opacity = '0';
+        setTimeout(function() { toast.style.display = 'none'; }, 300);
+    }, duration);
+}
+
+const isAuthenticated = {{ user.is_authenticated|yesno:"true,false" }};
+const isQuestionAuthor = isAuthenticated && {{ user.id|default:0 }} === {{ question.author.id }};
+
+function addAnswerToDOM(data) {
+    const placeholder = document.getElementById('no-answers-placeholder');
+    if (placeholder) placeholder.remove();
+
+    // Не дублировать если уже есть
+    if (document.querySelector('[data-answer-id="' + data.id + '"]')) return;
+
+    const likeButtons = isAuthenticated ? (
+        '<div class="like-buttons">' +
+        '<button class="like-btn answer-like" data-type="like" data-id="' + data.id + '">+</button>' +
+        '<button class="dislike-btn answer-dislike" data-type="dislike" data-id="' + data.id + '">-</button>' +
+        '</div>'
+    ) : '';
+
+    const helpfulBlock = isQuestionAuthor ? (
+        '<label class="correct-buttons">' +
+        '<input type="checkbox" class="correct-checkbox" data-answer-id="' + data.id + '">' +
+        '<span>Ответ помог!</span>' +
+        '</label>'
+    ) : '';
+
+    const avatarSrc = data.avatar_url ? escapeHtml(data.avatar_url) : '{% static "img/images.png" %}';
+
+    const div = document.createElement('div');
+    div.className = 'box';
+    div.dataset.answerId = data.id;
+    div.style.animation = 'fadeInAnswer 0.4s ease';
+    div.innerHTML =
+        '<div class="user_question">' +
+            '<img src="' + avatarSrc + '" alt="Аватар" class="avatar-img">' +
+            '<div class="like-counter" data-id="' + data.id + '">' +
+                likeButtons +
+                '<span class="likes-count">0</span>' +
+            '</div>' +
+        '</div>' +
+        '<div class="text_question">' +
+            '<p>' + escapeHtml(data.text) + '</p>' +
+            '<div class="line_box_question">' +
+                '<div><small>Автор: ' + escapeHtml(data.author) + '</small></div>' +
+                '<div>' + helpfulBlock + '</div>' +
+            '</div>' +
+        '</div>';
+
+    const list = document.getElementById('answers-list');
+    list.insertBefore(div, list.firstChild);
+
+    const counter = document.getElementById('answers-count');
+    if (counter) counter.textContent = parseInt(counter.textContent) + 1;
+
+    showToast('Новый ответ от ' + escapeHtml(data.author) + '!');
+}
+
+const _style = document.createElement('style');
+_style.textContent = '@keyframes fadeInAnswer{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}';
+document.head.appendChild(_style);
+
+const questionId = window.location.pathname.split('/')[2];
+const currentPage = new URLSearchParams(window.location.search).get('page') || '1';
+
+const centrifuge = new Centrifuge('ws://localhost:8001/connection/websocket');
+
+const sub = centrifuge.newSubscription('questions:' + questionId);
+
+sub.on('publication', function(ctx) {
+    console.log('📨 New answer:', ctx.data);
+    if (currentPage === '1') {
+        addAnswerToDOM(ctx.data);
+    } else {
+        showToast('Новый ответ от ' + escapeHtml(ctx.data.author) + '! Перейдите на первую страницу.', 6000);
+    }
+});
+
+sub.on('error', function(ctx) { console.error('Sub error:', ctx); });
+sub.subscribe();
+
+centrifuge.on('connected', function(ctx) { console.log('✅ Centrifugo connected:', ctx.client); });
+centrifuge.on('error', function(ctx) { console.error('Centrifugo error:', ctx); });
+centrifuge.connect();
+</script>
+{% endblock %}

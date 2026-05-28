@@ -1,0 +1,16 @@
+{
+  "secret": "your-secret-key-here",
+  "api_key": "your-api-key-here",
+  "admin_password": "admin",
+  "admin_secret": "admin",
+  "allowed_origins": ["http://localhost:8000"],
+  "token_hmac_secret_key": "your-hmac-secret-here",
+  "namespaces": [
+    {
+      "name": "questions",
+      "anonymous": false,
+      "publish": false,
+      "subscribe_to_publish": false
+    }
+  ]
+}
