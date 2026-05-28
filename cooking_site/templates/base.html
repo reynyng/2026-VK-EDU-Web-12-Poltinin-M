@@ -15,10 +15,19 @@
     <div class="header">
         <h1><a href="{% url 'app:home' %}" style="color: white;">Домашняя книга рецептов</a></h1>
         <div class="search">
-            <div class="box_without_border">
-                <input type="text" class="line" id="seek" name="seek" placeholder="введите запрос">
-                <a href="{% url 'app:ask' %}" class="button">Задать вопрос</a>
-            </div>    
+           <div class="box_without_borders" style="position: relative; width: 100%;">
+    <input type="text" class="line" id="search-input" name="seek" 
+           placeholder="введите запрос" autocomplete="off" 
+           style="width: 100%; box-sizing: border-box;">
+    <div id="search-results"
+         style="display: none; position: absolute; top: 100%; left: 0; margin-top: 5px; 
+                background: white; border: 1px solid #ddd; border-radius: 8px; 
+                width: 100%; max-height: 300px; overflow-y: auto; z-index: 1000; 
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+        <!-- сюда будут подставляться результаты поиска -->
+    </div>
+</div>
+            <a href="{% url 'app:ask' %}" class="button">Задать вопрос</a>
             
             <div class="log-box">
                 <div class="guest-avatar">
@@ -106,6 +115,71 @@
         window.csrftoken = csrftoken;
     </script>
     <script src="{% static 'js/bootstrap.js' %}"></script>
+    <script>
+// Debounce функция для поиска
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// Поиск
+const searchInput = document.getElementById('search-input');
+const searchResults = document.getElementById('search-results');
+
+if (searchInput) {
+    const performSearch = debounce(async function() {
+        const query = searchInput.value.trim();
+        
+        if (query.length < 2) {
+            searchResults.style.display = 'none';
+            return;
+        }
+        
+        try {
+            const response = await fetch(`/search/?q=${encodeURIComponent(query)}`);
+            const data = await response.json();
+            
+            if (data.results && data.results.length > 0) {
+                searchResults.innerHTML = data.results.map(result => `
+                    <a href="${result.url}" style="display: block; padding: 10px; text-decoration: none; color: #333; border-bottom: 1px solid #eee;">
+                        <div style="font-weight: bold;">${escapeHtml(result.title)}</div>
+                        <div style="font-size: 12px; color: #666;">${escapeHtml(result.text_preview)}</div>
+                    </a>
+                `).join('');
+                searchResults.style.display = 'block';
+            } else {
+                searchResults.innerHTML = '<div style="padding: 10px; color: #666;">Ничего не найдено</div>';
+                searchResults.style.display = 'block';
+            }
+        } catch (error) {
+            console.error('Search error:', error);
+        }
+    }, 300);
+    
+    searchInput.addEventListener('input', performSearch);
+    
+    // Закрыть поиск при клике вне
+    document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+            searchResults.style.display = 'none';
+        }
+    });
+    
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+}
+</script>
     {% block extra_js %}{% endblock %}
+<script src="https://unpkg.com/centrifuge@5.5.3/dist/centrifuge.js"></script>
 </body>
 </html>

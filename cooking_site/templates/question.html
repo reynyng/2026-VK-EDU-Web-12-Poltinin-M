@@ -39,8 +39,9 @@
 
 <hr>
 
-<div class="h2_custom" style="margin-left: 30px; font-size: 24px;">Ответы ({{ question.answers_count }})</div>
+<div class="h2_custom" style="margin-left: 30px; font-size: 24px;">Ответы (<span id="answers-count">{{ question.answers_count }}</span>)</div>
 
+<div id="answers-list">
 {% for answer in answers %}
 <div class="box">
     <div class="user_question">
@@ -86,12 +87,13 @@
     </div>
 </div>
 {% empty %}
-<div class="box">
+<div class="box" id="no-answers-placeholder">
     <div class="text_question">
         <p>Ответов пока нет. Будьте первым!</p>
     </div>
 </div>
 {% endfor %}
+</div>{# /answers-list #}
 
 {% include 'pagination.html' with page=page %}
 
@@ -116,7 +118,6 @@
         </div>
     </div>
 {% endif %}
-
 <script>
 function getCookie(name) {
     let cookieValue = null;
@@ -133,6 +134,54 @@ function getCookie(name) {
     return cookieValue;
 }
 const csrftoken = getCookie('csrftoken');
+
+// const questionId = window.location.pathname.split('/')[2];
+// let ws = null;
+
+// function connectWebSocket() {
+//     ws = new WebSocket('ws://localhost:8001/connection/websocket');
+    
+//     ws.onopen = () => {
+//         console.log('✅ WebSocket opened');
+//         ws.send(JSON.stringify({ "method": "connect", "params": {} }));
+//     };
+    
+//     ws.onmessage = (e) => {
+//         try {
+//             const data = JSON.parse(e.data);
+//             console.log('📨', data);
+            
+//             if (data.result && data.result.client) {
+//                 console.log('✅ Connected, client:', data.result.client);
+//                 ws.send(JSON.stringify({
+//                     "method": "subscribe",
+//                     "params": { "channel": `questions:${questionId}` }
+//                 }));
+//             }
+            
+//             if (data.result && data.result.publication) {
+//                 const answer = data.result.publication.data;
+//                 console.log('📨 New answer:', answer);
+                
+//                 const currentPage = new URLSearchParams(window.location.search).get('page') || '1';
+//                 if (currentPage === '1') {
+//                     alert(`Новый ответ от ${answer.author}! Обновите страницу.`);
+//                     location.reload();
+//                 } else {
+//                     alert(`Новый ответ от ${answer.author}! Перейдите на первую страницу.`);
+//                 }
+//             }
+//         } catch (err) {
+//             console.error('Parse error:', err);
+//         }
+//     };
+    
+//     ws.onclose = () => {
+//         console.log('WebSocket closed, reconnecting...');
+//         setTimeout(connectWebSocket, 3000);
+//     };
+// }
+
 
 {% if user.is_authenticated %}
 document.querySelectorAll('.like-btn:not(.answer-like), .dislike-btn:not(.answer-dislike)').forEach(btn => {
@@ -225,5 +274,118 @@ document.querySelectorAll('.correct-checkbox').forEach(checkbox => {
     });
 });
 {% endif %}
+</script>
+<script src="https://unpkg.com/centrifuge@5.0.0/dist/centrifuge.js"></script>
+<script>
+// ======== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ========
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function showToast(msg, duration) {
+    duration = duration || 4000;
+    let toast = document.getElementById('realtime-toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'realtime-toast';
+        toast.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#333;color:#fff;padding:12px 20px;border-radius:10px;z-index:9999;font-size:15px;box-shadow:0 4px 16px rgba(0,0,0,.3);transition:opacity .3s ease';
+        document.body.appendChild(toast);
+    }
+    toast.textContent = msg;
+    toast.style.opacity = '1';
+    toast.style.display = 'block';
+    clearTimeout(toast._t);
+    toast._t = setTimeout(function() {
+        toast.style.opacity = '0';
+        setTimeout(function() { toast.style.display = 'none'; }, 300);
+    }, duration);
+}
+
+// ======== ДОБАВЛЕНИЕ ОТВЕТА В DOM ========
+const isAuthenticated = {{ user.is_authenticated|yesno:"true,false" }};
+const isQuestionAuthor = isAuthenticated && {{ user.id|default:0 }} === {{ question.author.id }};
+
+function addAnswerToDOM(data) {
+    const placeholder = document.getElementById('no-answers-placeholder');
+    if (placeholder) placeholder.remove();
+
+    // Не дублировать если уже есть
+    if (document.querySelector('[data-answer-id="' + data.id + '"]')) return;
+
+    const likeButtons = isAuthenticated ? (
+        '<div class="like-buttons">' +
+        '<button class="like-btn answer-like" data-type="like" data-id="' + data.id + '">+</button>' +
+        '<button class="dislike-btn answer-dislike" data-type="dislike" data-id="' + data.id + '">-</button>' +
+        '</div>'
+    ) : '';
+
+    const helpfulBlock = isQuestionAuthor ? (
+        '<label class="correct-buttons">' +
+        '<input type="checkbox" class="correct-checkbox" data-answer-id="' + data.id + '">' +
+        '<span>Ответ помог!</span>' +
+        '</label>'
+    ) : '';
+
+    const avatarSrc = data.avatar_url ? escapeHtml(data.avatar_url) : '{% static "img/images.png" %}';
+
+    const div = document.createElement('div');
+    div.className = 'box';
+    div.dataset.answerId = data.id;
+    div.style.animation = 'fadeInAnswer 0.4s ease';
+    div.innerHTML =
+        '<div class="user_question">' +
+            '<img src="' + avatarSrc + '" alt="Аватар" class="avatar-img">' +
+            '<div class="like-counter" data-id="' + data.id + '">' +
+                likeButtons +
+                '<span class="likes-count">0</span>' +
+            '</div>' +
+        '</div>' +
+        '<div class="text_question">' +
+            '<p>' + escapeHtml(data.text) + '</p>' +
+            '<div class="line_box_question">' +
+                '<div><small>Автор: ' + escapeHtml(data.author) + '</small></div>' +
+                '<div>' + helpfulBlock + '</div>' +
+            '</div>' +
+        '</div>';
+
+    const list = document.getElementById('answers-list');
+    list.insertBefore(div, list.firstChild);
+
+    const counter = document.getElementById('answers-count');
+    if (counter) counter.textContent = parseInt(counter.textContent) + 1;
+
+    showToast('Новый ответ от ' + escapeHtml(data.author) + '!');
+}
+
+// CSS анимация
+const _style = document.createElement('style');
+_style.textContent = '@keyframes fadeInAnswer{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}';
+document.head.appendChild(_style);
+
+// ======== CENTRIFUGO ========
+const questionId = window.location.pathname.split('/')[2];
+const currentPage = new URLSearchParams(window.location.search).get('page') || '1';
+
+const centrifuge = new Centrifuge('ws://localhost:8001/connection/websocket');
+
+const sub = centrifuge.newSubscription('questions:' + questionId);
+
+sub.on('publication', function(ctx) {
+    console.log('📨 New answer:', ctx.data);
+    if (currentPage === '1') {
+        addAnswerToDOM(ctx.data);
+    } else {
+        showToast('Новый ответ от ' + escapeHtml(ctx.data.author) + '! Перейдите на первую страницу.', 6000);
+    }
+});
+
+sub.on('error', function(ctx) { console.error('Sub error:', ctx); });
+sub.subscribe();
+
+centrifuge.on('connected', function(ctx) { console.log('✅ Centrifugo connected:', ctx.client); });
+centrifuge.on('error', function(ctx) { console.error('Centrifugo error:', ctx); });
+centrifuge.connect();
 </script>
 {% endblock %}

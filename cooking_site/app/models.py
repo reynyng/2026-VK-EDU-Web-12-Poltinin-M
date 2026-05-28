@@ -2,7 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinLengthValidator
 from django.urls import reverse
-
+from django.contrib.postgres.search import SearchVectorField
+from django.contrib.postgres.indexes import GinIndex
 
 class Tag(models.Model):
     id = models.AutoField(primary_key=True)  # SERIAL
@@ -37,6 +38,12 @@ class Question(models.Model):
     answers_count = models.IntegerField(default=0, db_index=True)
     is_deleted = models.BooleanField(default=False, db_index=True)
     
+    search_vector = SearchVectorField(null=True, editable=False)
+    
+    class Meta:
+        indexes = [
+            GinIndex(fields=['search_vector'], name='question_search_idx'),
+        ]
     objects = QuestionManager()
     
     def __str__(self):

@@ -19,12 +19,6 @@
             <img src="{% static 'img/images.png' %}" alt="Аватар по умолчанию" class="avatar-img">
         {% endif %}
         <div class="like-counter" data-id="{{ question.id }}">
-            {% if user.is_authenticated %}
-                <div class="like-buttons">
-                    <button class="like-btn" data-type="like" data-id="{{ question.id }}">+</button>
-                    <button class="dislike-btn" data-type="dislike" data-id="{{ question.id }}">-</button>
-                </div>
-            {% endif %}
             <span class="likes-count">{{ question.likes_count|default:0 }}</span>
         </div>
     </div>

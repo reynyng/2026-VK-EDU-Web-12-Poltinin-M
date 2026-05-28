@@ -9,6 +9,7 @@ urlpatterns = [
     path('tag/<str:tag_name>/', views.tag_questions_view, name='tag_questions'),
     path('question/<int:question_id>/', views.question_detail_view, name='question_detail'),
     path('ask/', views.ask_view, name='ask'),
+    path('search/', views.search_view, name='search'),  # НОВЫЙ маршрут для поиска
     
     # API для лайков
     path('api/question/<int:question_id>/like/', views.question_like_view, name='question_like'),
