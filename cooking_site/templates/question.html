@@ -135,54 +135,6 @@ function getCookie(name) {
 }
 const csrftoken = getCookie('csrftoken');
 
-// const questionId = window.location.pathname.split('/')[2];
-// let ws = null;
-
-// function connectWebSocket() {
-//     ws = new WebSocket('ws://localhost:8001/connection/websocket');
-    
-//     ws.onopen = () => {
-//         console.log('✅ WebSocket opened');
-//         ws.send(JSON.stringify({ "method": "connect", "params": {} }));
-//     };
-    
-//     ws.onmessage = (e) => {
-//         try {
-//             const data = JSON.parse(e.data);
-//             console.log('📨', data);
-            
-//             if (data.result && data.result.client) {
-//                 console.log('✅ Connected, client:', data.result.client);
-//                 ws.send(JSON.stringify({
-//                     "method": "subscribe",
-//                     "params": { "channel": `questions:${questionId}` }
-//                 }));
-//             }
-            
-//             if (data.result && data.result.publication) {
-//                 const answer = data.result.publication.data;
-//                 console.log('📨 New answer:', answer);
-                
-//                 const currentPage = new URLSearchParams(window.location.search).get('page') || '1';
-//                 if (currentPage === '1') {
-//                     alert(`Новый ответ от ${answer.author}! Обновите страницу.`);
-//                     location.reload();
-//                 } else {
-//                     alert(`Новый ответ от ${answer.author}! Перейдите на первую страницу.`);
-//                 }
-//             }
-//         } catch (err) {
-//             console.error('Parse error:', err);
-//         }
-//     };
-    
-//     ws.onclose = () => {
-//         console.log('WebSocket closed, reconnecting...');
-//         setTimeout(connectWebSocket, 3000);
-//     };
-// }
-
-
 {% if user.is_authenticated %}
 document.querySelectorAll('.like-btn:not(.answer-like), .dislike-btn:not(.answer-dislike)').forEach(btn => {
     btn.addEventListener('click', function() {
@@ -277,7 +229,7 @@ document.querySelectorAll('.correct-checkbox').forEach(checkbox => {
 </script>
 <script src="https://unpkg.com/centrifuge@5.0.0/dist/centrifuge.js"></script>
 <script>
-// ======== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ========
+
 function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
@@ -303,7 +255,6 @@ function showToast(msg, duration) {
     }, duration);
 }
 
-// ======== ДОБАВЛЕНИЕ ОТВЕТА В DOM ========
 const isAuthenticated = {{ user.is_authenticated|yesno:"true,false" }};
 const isQuestionAuthor = isAuthenticated && {{ user.id|default:0 }} === {{ question.author.id }};
 
@@ -359,12 +310,10 @@ function addAnswerToDOM(data) {
     showToast('Новый ответ от ' + escapeHtml(data.author) + '!');
 }
 
-// CSS анимация
 const _style = document.createElement('style');
 _style.textContent = '@keyframes fadeInAnswer{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}';
 document.head.appendChild(_style);
 
-// ======== CENTRIFUGO ========
 const questionId = window.location.pathname.split('/')[2];
 const currentPage = new URLSearchParams(window.location.search).get('page') || '1';
 
