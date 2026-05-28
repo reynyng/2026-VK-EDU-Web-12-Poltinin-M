@@ -162,7 +162,7 @@ h1 {
 @media screen and (max-width: 1199px) and (min-width: 768px) {
     .custom_container {
         display: grid;
-        grid-template: "header header" 120px
+        grid-template: "header header" 130px
                        "main side" auto
                        "footer footer" 50px
                        / 2fr 1fr;
@@ -175,7 +175,7 @@ h1 {
     }
     
     .button {
-        width: 25%;
+        width: 40%;
         margin: auto;
     }
     
@@ -229,7 +229,7 @@ h1 {
 @media screen and (min-width: 1200px) {
    .custom_container{
     display: grid;
-    grid-template: "header header" 125px
+    grid-template: "header header" 130px
                     "main side" auto
                     "footer footer" 50px
                     /3fr 1fr;
@@ -243,7 +243,6 @@ h1 {
     
     .line {
         width: 45%;
-        margin: 15px;
         padding: 0 30px;
     }
     
@@ -305,7 +304,7 @@ h1 {
     flex-direction: column;
     flex-wrap: wrap;
     width: 50px;
-    margin: auto;
+    margin: 20px;
 }
 
 .avatar-img_question{
@@ -333,4 +332,21 @@ html, body {
     height: 100%;
     margin: 0;
     padding: 0;
+}
+
+
+.search-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 5px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    width: 100%;
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
